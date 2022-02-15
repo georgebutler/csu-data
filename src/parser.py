@@ -38,23 +38,20 @@ class Section:
         self.waitlist_cap = -1
         self.waitlist_total = -1
         self.facility_id = ""
-        self.weekdays = []
+        self.weekdays = ""
 
     def __eq__(self, other):
         return self.number == other.number
 
     def __repr__(self):
-        return (f'{self.__class__.__name__}('f'{self.course!r}, {self.number!r}, {self.instructor!r})')
-    
-    def add_weekday(self, weekday):
-        if weekday not in self.weekdays:
-            self.weekdays.append(weekday)
+        return (f'{self.__class__.__name__}('f'{self.course!r}, {self.number!r}, {self.weekdays!r}, {self.instructor!r})')
 
 # Constants
 CELLKEY_Course_ID = 4
 CELLKEY_Course_CATALOG = 8
-CELLKEY_Section_NUMBER = 9
 CELLKEY_Course_DESC = 10
+CELLKEY_Section_NUMBER = 9
+CELLKEY_Section_WEEKDAYS = 20
 CELLKEY_Instructor_LAST = 23
 CELLKEY_Instructor_FIRST = 24
 
@@ -72,12 +69,14 @@ for rx in range(2, worksheet.nrows):
     CELLDATA_Course_ID = worksheet.cell(rx, CELLKEY_Course_ID).value
     CELLDATA_Course_CATALOG = worksheet.cell(rx, CELLKEY_Course_CATALOG).value
     CELLDATA_Section_NUMBER = worksheet.cell(rx, CELLKEY_Section_NUMBER).value
+    CELLDATA_Section_WEEKDAYS = worksheet.cell(rx, CELLKEY_Section_WEEKDAYS).value
     CELLDATA_Instructor_LAST = worksheet.cell(rx, CELLKEY_Instructor_LAST).value
     CELLDATA_Instructor_FIRST = worksheet.cell(rx, CELLKEY_Instructor_FIRST).value
 
     course = Course(CELLDATA_Course_ID, CELLDATA_Course_CATALOG)
     instructor = Instructor(CELLDATA_Instructor_FIRST, CELLDATA_Instructor_LAST)
     section = Section(course, CELLDATA_Section_NUMBER, instructor)
+    section.weekdays = CELLDATA_Section_WEEKDAYS
 
     # section = Section(courseID, catalog)
     # sections.append(section)
@@ -88,8 +87,11 @@ for rx in range(2, worksheet.nrows):
         if (section not in existing.sections):
             existing.add_section(section)
     else:
-        course.add_section(section)
         courses.append(course)
+
+        # Skip this if the section doesn't have an instructor
+        if (instructor.name_first == '' or instructor.name_last == ''):
+            course.add_section(section)
 
 for course in courses:
     print(str(course))
