@@ -1,59 +1,21 @@
 import os, xlrd
-
-# Instructor
-class Instructor:
-    def __init__(self, name_first, name_last):
-        self.name_first = name_first.strip()
-        self.name_last = name_last.strip()
-
-    def __repr__(self):
-        return (f'{self.__class__.__name__}('f'{self.name_first!r} {self.name_last!r})')
-
-# Course
-class Course:
-    def __init__(self, id, catalog):
-        self.id = id.strip()
-        self.catalog = catalog.strip()
-        self.desc = ""
-        self.sections = []
-
-    def __eq__(self, other):
-        return self.id == other.id
-    
-    def __repr__(self):
-        return (f'{self.__class__.__name__}('f'{self.id!r}, {self.catalog!r})')
-
-    def add_section(self, section):
-        if section not in self.sections:
-            self.sections.append(section)
-
-# Section
-class Section:
-    def __init__(self, course: Course, number, instructor: Instructor):
-        self.course = course
-        self.instructor = instructor
-        self.number = number
-        self.enroll_cap = -1
-        self.enroll_total = -1
-        self.waitlist_cap = -1
-        self.waitlist_total = -1
-        self.facility_id = ""
-        self.weekdays = ""
-
-    def __eq__(self, other):
-        return self.number == other.number
-
-    def __repr__(self):
-        return (f'{self.__class__.__name__}('f'{self.course!r}, {self.number!r}, {self.weekdays!r}, {self.instructor!r})')
+from instructor import Instructor
+from course import Course
+from section import Section
 
 # Constants
-CELLKEY_Course_ID = 4
-CELLKEY_Course_CATALOG = 8
-CELLKEY_Course_DESC = 10
-CELLKEY_Section_NUMBER = 9
-CELLKEY_Section_WEEKDAYS = 20
-CELLKEY_Instructor_LAST = 23
-CELLKEY_Instructor_FIRST = 24
+CELLKEY_COURSE_ID = 4
+CELLKEY_COURSE_CATALOG = 8
+CELLKEY_COURSE_DESC = 10
+CELLKEY_SECTION_NUMBER = 9
+CELLKEY_SECTION_FACILITY = 19
+CELLKEY_SECTION_WEEKDAYS = 20
+CELLKEY_INSTRUCTOR_LAST = 23
+CELLKEY_INSTRUCTOR_FIRST = 24
+
+MONTHKEY_FALL = 7
+MONTHKEY_SPRING = 3
+MONTHKEY_SUMMER = 5
 
 # Globals
 courses = []
@@ -66,17 +28,18 @@ for rx in range(2, worksheet.nrows):
     # print("")
 
     # Extract data from cells
-    CELLDATA_Course_ID = worksheet.cell(rx, CELLKEY_Course_ID).value
-    CELLDATA_Course_CATALOG = worksheet.cell(rx, CELLKEY_Course_CATALOG).value
-    CELLDATA_Section_NUMBER = worksheet.cell(rx, CELLKEY_Section_NUMBER).value
-    CELLDATA_Section_WEEKDAYS = worksheet.cell(rx, CELLKEY_Section_WEEKDAYS).value
-    CELLDATA_Instructor_LAST = worksheet.cell(rx, CELLKEY_Instructor_LAST).value
-    CELLDATA_Instructor_FIRST = worksheet.cell(rx, CELLKEY_Instructor_FIRST).value
+    CELLDATA_Course_ID = worksheet.cell(rx, CELLKEY_COURSE_ID).value
+    CELLDATA_Course_CATALOG = worksheet.cell(rx, CELLKEY_COURSE_CATALOG).value
+    CELLDATA_Course_DESC = worksheet.cell(rx, CELLKEY_COURSE_DESC).value
+    CELLDATA_Section_NUMBER = worksheet.cell(rx, CELLKEY_SECTION_NUMBER).value
+    CELLDATA_Section_FACILITY = worksheet.cell(rx, CELLKEY_SECTION_FACILITY).value
+    CELLDATA_Section_WEEKDAYS = worksheet.cell(rx, CELLKEY_SECTION_WEEKDAYS).value
+    CELLDATA_Instructor_LAST = worksheet.cell(rx, CELLKEY_INSTRUCTOR_LAST).value
+    CELLDATA_Instructor_FIRST = worksheet.cell(rx, CELLKEY_INSTRUCTOR_FIRST).value
 
-    course = Course(CELLDATA_Course_ID, CELLDATA_Course_CATALOG)
+    course = Course(CELLDATA_Course_ID, CELLDATA_Course_CATALOG, CELLDATA_Course_DESC)
     instructor = Instructor(CELLDATA_Instructor_FIRST, CELLDATA_Instructor_LAST)
-    section = Section(course, CELLDATA_Section_NUMBER, instructor)
-    section.weekdays = CELLDATA_Section_WEEKDAYS
+    section = Section(course, CELLDATA_Section_NUMBER, instructor, CELLDATA_Section_FACILITY, CELLDATA_Section_WEEKDAYS)
 
     # section = Section(courseID, catalog)
     # sections.append(section)
@@ -90,14 +53,24 @@ for rx in range(2, worksheet.nrows):
         courses.append(course)
 
         # Skip this if the section doesn't have an instructor
-        if (instructor.name_first == '' or instructor.name_last == ''):
+        if (instructor.name_first and instructor.name_last):
             course.add_section(section)
 
 for course in courses:
     print(str(course))
 
-    for section in course.sections:
-        print("> " + str(section))
+    course_weekly = []
+    course_locations = []
 
+    for section in course.sections:
+        if section.weekdays not in course_weekly:
+            course_weekly.append(section.weekdays)
+
+        if section.facility_id not in course_locations:
+            course_locations.append(section.facility_id)
+
+    print("> Sections: " + str(len(course.sections)))
+    print("> When: " + ", ".join(course_weekly))
+    print("> Where: " + ", ".join(course_locations))
     print("")
 
