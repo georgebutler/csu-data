@@ -1,6 +1,6 @@
-SEASON_FALL = 7
-SEASON_SPRING = 3
-SEASON_SUMMER = 5
+SEASON_FALL = '7'
+SEASON_SPRING = '3'
+SEASON_SUMMER = '5'
 
 class Semester:
     def __init__(self, season):
@@ -29,5 +29,5 @@ class Year:
         return (f'{self.__class__.__name__}('f'{self.year!r})')
 
     def add_course(self, course, semester_code):
-        if course not in self.semesters[semester_code]:
+        if course not in self.semesters[semester_code].courses:
             self.semesters[semester_code].courses.append(course)
