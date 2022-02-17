@@ -13,6 +13,22 @@ class Semester:
     def __repr__(self):
         return (f'{self.__class__.__name__}('f'{self.season!r})')
 
+    def display(self):
+        print("----")
+
+        if (self.season == SEASON_FALL):
+            print("Fall")
+        elif (self.season == SEASON_SPRING):
+            print("Spring")
+        elif (self.season == SEASON_SUMMER):
+            print("Summer")
+        else:
+            print("Unknown Season")
+
+        print("----")
+        for course in self.courses:
+            print(str(course))
+
 class Year:
     def __init__(self, year):
         self.year = year
@@ -27,6 +43,14 @@ class Year:
 
     def __repr__(self):
         return (f'{self.__class__.__name__}('f'{self.year!r})')
+
+    def display(self):
+        print("============")
+        print(str(self))
+        print("============")
+
+        for _, semester in self.semesters.items():
+            semester.display()
 
     def add_course(self, course, semester_code):
         if course not in self.semesters[semester_code].courses:

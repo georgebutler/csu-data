@@ -1,8 +1,8 @@
 import os, xlrd
-from instructor import Instructor
-from course import Course
-from section import Section
-from year import Year
+from classes.instructor import Instructor
+from classes.course import Course
+from classes.section import Section
+from classes.year import Year
 
 # Constants
 CELLKEY_COURSE_TERM = 0
@@ -16,18 +16,25 @@ CELLKEY_INSTRUCTOR_LAST = 23
 CELLKEY_INSTRUCTOR_FIRST = 24
 
 # Globals
+years = []
+
+# File Extraction
 for filename in os.listdir(os.getcwd() + ".\input"):
     workbook = xlrd.open_workbook(os.path.join(".\input", filename))
     worksheet = workbook.sheet_by_index(0)
 
     # Extract year from cell
     CELLDATA_YearSeason = worksheet.cell(2, CELLKEY_COURSE_TERM).value
+    STRING_Year = CELLDATA_YearSeason[0] + "0" + CELLDATA_YearSeason[1:3]
+    year = Year(STRING_Year)
 
-    year = Year(CELLDATA_YearSeason[0] + "0" + CELLDATA_YearSeason[1:3])
+    if (year in years):
+        year = years[years.index(year)]
+    else:
+        years.append(year)
+    
     semester = CELLDATA_YearSeason[3]
     courses = []
-    print("- " + str(year))
-    print("")
 
     for rx in range(2, worksheet.nrows):
         # print(worksheet.row_values(rx))
@@ -63,7 +70,7 @@ for filename in os.listdir(os.getcwd() + ".\input"):
                 course.add_section(section)
 
     for course in courses:
-        print("-- " + str(course))
+        # print("-- " + str(course))
         year.add_course(course, semester)
 
         course_weekly = []
@@ -76,8 +83,11 @@ for filename in os.listdir(os.getcwd() + ".\input"):
             if section.facility_id not in course_locations:
                 course_locations.append(section.facility_id)
 
-        print("--- Sections: " + str(len(course.sections)))
-        print("--- When: " + ", ".join(course_weekly))
-        print("--- Where: " + ", ".join(course_locations))
-        print("")
+        # print("--- Sections: " + str(len(course.sections)))
+        # print("--- When: " + ", ".join(course_weekly))
+        # print("--- Where: " + ", ".join(course_locations))
+        # print("")
+
+for year in years:
+    year.display()
 
