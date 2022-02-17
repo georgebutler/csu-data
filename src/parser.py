@@ -2,8 +2,10 @@ import os, xlrd
 from instructor import Instructor
 from course import Course
 from section import Section
+from year import Year
 
 # Constants
+CELLKEY_COURSE_TERM = 0
 CELLKEY_COURSE_ID = 4
 CELLKEY_COURSE_CATALOG = 8
 CELLKEY_COURSE_DESC = 10
@@ -13,15 +15,17 @@ CELLKEY_SECTION_WEEKDAYS = 20
 CELLKEY_INSTRUCTOR_LAST = 23
 CELLKEY_INSTRUCTOR_FIRST = 24
 
-MONTHKEY_FALL = 7
-MONTHKEY_SPRING = 3
-MONTHKEY_SUMMER = 5
-
 # Globals
-courses = []
-
 workbook = xlrd.open_workbook(os.getcwd() + r"\input\Fall-2018-SFO_CS_AR_CLASS_SCHED_ENR_RCAP_176475251.xlsx")
 worksheet = workbook.sheet_by_index(0)
+
+# Extract year from cell
+CELLDATA_YearSeason = worksheet.cell(2, CELLKEY_COURSE_TERM).value
+
+year = Year(CELLDATA_YearSeason[0] + "0" + CELLDATA_YearSeason[1:3])
+courses = []
+print("- " + str(year))
+print("")
 
 for rx in range(2, worksheet.nrows):
     # print(worksheet.row_values(rx))
@@ -57,8 +61,9 @@ for rx in range(2, worksheet.nrows):
             course.add_section(section)
 
 for course in courses:
-    print(str(course))
-
+    print("-- " + str(course))
+    year.add_course(course)
+    
     course_weekly = []
     course_locations = []
 
@@ -69,8 +74,8 @@ for course in courses:
         if section.facility_id not in course_locations:
             course_locations.append(section.facility_id)
 
-    print("> Sections: " + str(len(course.sections)))
-    print("> When: " + ", ".join(course_weekly))
-    print("> Where: " + ", ".join(course_locations))
+    print("--- Sections: " + str(len(course.sections)))
+    print("--- When: " + ", ".join(course_weekly))
+    print("--- Where: " + ", ".join(course_locations))
     print("")
 
