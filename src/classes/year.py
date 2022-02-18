@@ -3,8 +3,9 @@ SEASON_SPRING = '3'
 SEASON_SUMMER = '5'
 
 class Semester:
-    def __init__(self, season):
+    def __init__(self, season, year):
         self.season = season
+        self.year = year
         self.courses = []
 
     def __eq__(self, other):
@@ -27,15 +28,31 @@ class Semester:
 
         print("----")
         for course in self.courses:
-            print(str(course))
+            course_weekly = []
+            course_locations = []
+
+            for section in course.sections:
+                if section.weekdays not in course_weekly:
+                    course_weekly.append(section.weekdays)
+
+                if section.facility_id not in course_locations:
+                    course_locations.append(section.facility_id)
+
+            print("> " + str(course))
+            # print(">> Sections: " + str(len(course.sections)))
+            print(">> How Often: " + str(self.year.yearly_offered[course.id]) + "/3 times yearly.")
+            print(">> When: " + ", ".join(course_weekly))
+            print(">> Where: " + ", ".join(course_locations))
+            print("")
 
 class Year:
     def __init__(self, year):
         self.year = year
+        self.yearly_offered = {}
         self.semesters = {
-            SEASON_FALL: Semester(SEASON_FALL),
-            SEASON_SPRING: Semester(SEASON_SPRING),
-            SEASON_SUMMER: Semester(SEASON_SUMMER)
+            SEASON_FALL: Semester(SEASON_FALL, self),
+            SEASON_SPRING: Semester(SEASON_SPRING, self),
+            SEASON_SUMMER: Semester(SEASON_SUMMER, self)
         }
 
     def __eq__(self, other):
@@ -55,3 +72,8 @@ class Year:
     def add_course(self, course, semester_code):
         if course not in self.semesters[semester_code].courses:
             self.semesters[semester_code].courses.append(course)
+
+            if course.id in self.yearly_offered:
+                self.yearly_offered[course.id] = self.yearly_offered[course.id] + 1
+            else:
+                self.yearly_offered[course.id] = 1

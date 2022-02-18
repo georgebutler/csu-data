@@ -73,21 +73,6 @@ for filename in os.listdir(os.getcwd() + ".\input"):
         # print("-- " + str(course))
         year.add_course(course, semester)
 
-        course_weekly = []
-        course_locations = []
-
-        for section in course.sections:
-            if section.weekdays not in course_weekly:
-                course_weekly.append(section.weekdays)
-
-            if section.facility_id not in course_locations:
-                course_locations.append(section.facility_id)
-
-        # print("--- Sections: " + str(len(course.sections)))
-        # print("--- When: " + ", ".join(course_weekly))
-        # print("--- Where: " + ", ".join(course_locations))
-        # print("")
-
-for year in years:
+for year in years:   
     year.display()
 
