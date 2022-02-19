@@ -9,7 +9,7 @@ class Course:
         return self.id == other.id
     
     def __repr__(self):
-        return (f'{self.__class__.__name__}('f'{self.id!r}, {self.catalog!r}, {self.desc!r})')
+        return (f'{self.__class__.__name__}('f'{self.catalog!r}, {self.desc!r})')
 
     def add_section(self, section):
         if section not in self.sections:
