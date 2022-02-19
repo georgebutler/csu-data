@@ -128,7 +128,8 @@ for year in years:
 
             print("> " + str(course))
             # print(">> Sections: " + str(len(course.sections)))
-            print(">> How Often: " + str(semester.year.yearly_offered[course.id]) + "/3 (FALL, SPRING, SUMMER).")
+            # TODO: provide information about what seasons the course is offered.
+            print(">> How Often: " + str(semester.year.yearly_offered[course.id]) + "/3") 
             print(">> When: " + ", ".join(course_weekly))
             print(">> Where: " + ", ".join(course_locations))
             # print(">> Total Enrollment: " + str(section.enroll_total) + " / " + str(section.enroll_cap))
