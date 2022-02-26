@@ -95,44 +95,57 @@ for year in years:
     print(str(year))
     print("")
 
-    for _, semester in year.semesters.items():
-        if (semester.season == SEASON_FALL):
-            output.write("Fall\n")
-            print("Fall")
-        elif (semester.season == SEASON_SPRING):
-            output.write("Spring\n")
-            print("Spring")
-        elif (semester.season == SEASON_SUMMER):
-            output.write("Summer\n")
-            print("Summer")
+    yearly_course_enrollment = {}
 
-        output.write("\n")
-        print("----")
+    for _, semester in year.semesters.items():
+        #if (semester.season == SEASON_FALL):
+            #output.write("Fall\n")
+            #print("Fall")
+        #elif (semester.season == SEASON_SPRING):
+            #output.write("Spring\n")
+            #print("Spring")
+        #elif (semester.season == SEASON_SUMMER):
+            #output.write("Summer\n")
+            #print("Summer")
+
+        #output.write("\n")
+        #print("----\n")
 
         for course in semester.courses:
             course_weekly = []
             course_locations = []
 
             for section in course.sections:
+                if course.id not in yearly_course_enrollment:
+                    yearly_course_enrollment[course.id] = 0
+
                 if section.weekdays not in course_weekly:
                     course_weekly.append(section.weekdays)
 
                 if section.facility_id not in course_locations:
                     course_locations.append(section.facility_id)
 
+            #TODO: How often?
             output.write(str(course) + "\n")
-            output.write("> How Often: " + str(semester.year.yearly_offered[course.id]) + "/3 (FALL, SPRING, SUMMER). \n")
-            output.write("> When: " + ", ".join(course_weekly) + "\n")
+            output.write("> How Often: TODO\n")
+            output.write("> When (Semester): " + ", ".join(semester.year.yearly_offered[course.id]) + "\n")
+            output.write("> When (Weekly): " + ", ".join(course_weekly) + "\n")
             output.write("> Where: " + ", ".join(course_locations) + "\n")
             output.write("\n")
 
             print("> " + str(course))
             # print(">> Sections: " + str(len(course.sections)))
-            # TODO: provide information about what seasons the course is offered.
-            print(">> How Often: " + str(semester.year.yearly_offered[course.id]) + "/3") 
-            print(">> When: " + ", ".join(course_weekly))
+            print(">> How Often: TODO")
+            print(">> When (Semester): " + ", ".join(semester.year.yearly_offered[course.id])) 
+            print(">> When (Weekly): " + ", ".join(course_weekly))
             print(">> Where: " + ", ".join(course_locations))
             # print(">> Total Enrollment: " + str(section.enroll_total) + " / " + str(section.enroll_cap))
             print("")
+    
+
+for year in years:
+    #TODO: Move this into the yearly print above, just here so I can see all the years at once in the terminal.  
+    print(str(yearly_course_enrollment))
+    print("")
 
 output.close()

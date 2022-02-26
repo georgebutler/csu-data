@@ -35,7 +35,16 @@ class Year:
         if course not in self.semesters[semester_code].courses:
             self.semesters[semester_code].courses.append(course)
 
-            if course.id in self.yearly_offered:
-                self.yearly_offered[course.id] = self.yearly_offered[course.id] + 1
-            else:
-                self.yearly_offered[course.id] = 1
+            converted_code = ""
+
+            if (semester_code == SEASON_FALL):
+                converted_code = "Fall"
+            elif (semester_code == SEASON_SPRING):
+                converted_code = "Spring"
+            elif (semester_code == SEASON_SUMMER):
+                converted_code = "Summer"
+
+            if course.id not in self.yearly_offered:
+                self.yearly_offered[course.id] = []
+
+            self.yearly_offered[course.id].append(converted_code)
