@@ -18,7 +18,7 @@ class Year:
     def __init__(self, year):
         self.year = year
         self.yearly_offered = {}
-        self.enrolled_average = {}
+        self.enrolled_raw = {}
         self.semesters = {
             SEASON_FALL: Semester(SEASON_FALL, self),
             SEASON_SPRING: Semester(SEASON_SPRING, self),

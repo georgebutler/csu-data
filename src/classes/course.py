@@ -4,6 +4,8 @@ class Course:
         self.catalog = catalog.strip()
         self.desc = desc.strip()
         self.sections = []
+        self.yearly_enrolled = 0
+        self.yearly_enrolled_average = 0
 
     def __eq__(self, other):
         return self.id == other.id

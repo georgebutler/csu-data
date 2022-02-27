@@ -1,5 +1,6 @@
 import os
 import xlrd
+import math
 from classes.instructor import Instructor
 from classes.course import Course
 from classes.section import Section
@@ -95,35 +96,39 @@ for year in years:
     print(str(year))
     print("")
 
-    yearly_course_enrollment = {}
-
+    # Calculate
     for _, semester in year.semesters.items():
-        #if (semester.season == SEASON_FALL):
-            #output.write("Fall\n")
-            #print("Fall")
-        #elif (semester.season == SEASON_SPRING):
-            #output.write("Spring\n")
-            #print("Spring")
-        #elif (semester.season == SEASON_SUMMER):
-            #output.write("Summer\n")
-            #print("Summer")
-
-        #output.write("\n")
-        #print("----\n")
-
         for course in semester.courses:
             course_weekly = []
             course_locations = []
 
             for section in course.sections:
-                if course.id not in yearly_course_enrollment:
-                    yearly_course_enrollment[course.id] = 0
+                if int(year.year) >= 2019:
+                    if course.id not in year.enrolled_raw:
+                        year.enrolled_raw[course.id] = int(section.enroll_total)
+                        course.yearly_enrolled = int(section.enroll_total)
+                    else:
+                        year.enrolled_raw[course.id] = int(year.enrolled_raw[course.id] + section.enroll_total)
+                        course.yearly_enrolled = int(course.yearly_enrolled + section.enroll_total)
 
                 if section.weekdays not in course_weekly:
                     course_weekly.append(section.weekdays)
 
                 if section.facility_id not in course_locations:
                     course_locations.append(section.facility_id)
+    
+    avg = 0
+    
+    # Display
+    for _, semester in year.semesters.items():
+        for course in semester.courses:
+            # Averages
+            if course.id in year.enrolled_raw:
+                print(year.enrolled_raw[course.id])
+                avg = avg + year.enrolled_raw[course.id]
+                print()
+
+            course.yearly_enrolled_average = math.floor(avg / 3)
 
             #TODO: How often?
             output.write(str(course) + "\n")
@@ -131,6 +136,7 @@ for year in years:
             output.write("> When (Semester): " + ", ".join(semester.year.yearly_offered[course.id]) + "\n")
             output.write("> When (Weekly): " + ", ".join(course_weekly) + "\n")
             output.write("> Where: " + ", ".join(course_locations) + "\n")
+            output.write("> Enrollment: TODO\n")
             output.write("\n")
 
             print("> " + str(course))
@@ -139,13 +145,11 @@ for year in years:
             print(">> When (Semester): " + ", ".join(semester.year.yearly_offered[course.id])) 
             print(">> When (Weekly): " + ", ".join(course_weekly))
             print(">> Where: " + ", ".join(course_locations))
-            # print(">> Total Enrollment: " + str(section.enroll_total) + " / " + str(section.enroll_cap))
-            print("")
-    
+            print(">> Total Enrollment (All Sections " + str(year.year) + "): " + str(course.yearly_enrolled))
 
-for year in years:
-    #TODO: Move this into the yearly print above, just here so I can see all the years at once in the terminal.  
-    print(str(yearly_course_enrollment))
-    print("")
+            if int(year.year) == 2021:
+                print(">> Average Enrollment (All Sections 2019-2021): " + str(course.yearly_enrolled_average))
+            
+            print("")
 
 output.close()
