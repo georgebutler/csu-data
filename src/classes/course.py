@@ -5,7 +5,7 @@ class Course:
         self.desc = desc.strip()
         self.sections = []
         self.yearly_enrolled = 0
-        self.yearly_enrolled_average = 0
+        self.yearly_enrolled_avg = -1
 
     def __eq__(self, other):
         return self.id == other.id
@@ -15,4 +15,5 @@ class Course:
 
     def add_section(self, section):
         if section not in self.sections:
+            self.yearly_enrolled = int(self.yearly_enrolled + section.enroll_total)
             self.sections.append(section)

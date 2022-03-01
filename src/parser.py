@@ -1,6 +1,6 @@
 import os
 import xlrd
-import math
+from collections import Counter
 from classes.instructor import Instructor
 from classes.course import Course
 from classes.section import Section
@@ -87,7 +87,7 @@ for filename in os.listdir(os.getcwd() + ".\input"):
     for course in courses:
         year.add_course(course, semester)
 
-for year in years:
+for year_index, year in enumerate(years):
     output = open(os.getcwd() + ".\output\%s.txt" % year.year, "w")
 
     output.write(str(year) + "\n")
@@ -103,32 +103,11 @@ for year in years:
             course_locations = []
 
             for section in course.sections:
-                if int(year.year) >= 2019:
-                    if course.id not in year.enrolled_raw:
-                        year.enrolled_raw[course.id] = int(section.enroll_total)
-                        course.yearly_enrolled = int(section.enroll_total)
-                    else:
-                        year.enrolled_raw[course.id] = int(year.enrolled_raw[course.id] + section.enroll_total)
-                        course.yearly_enrolled = int(course.yearly_enrolled + section.enroll_total)
-
                 if section.weekdays not in course_weekly:
                     course_weekly.append(section.weekdays)
 
                 if section.facility_id not in course_locations:
                     course_locations.append(section.facility_id)
-    
-    avg = 0
-    
-    # Display
-    for _, semester in year.semesters.items():
-        for course in semester.courses:
-            # Averages
-            if course.id in year.enrolled_raw:
-                print(year.enrolled_raw[course.id])
-                avg = avg + year.enrolled_raw[course.id]
-                print()
-
-            course.yearly_enrolled_average = math.floor(avg / 3)
 
             #TODO: How often?
             output.write(str(course) + "\n")
@@ -145,11 +124,19 @@ for year in years:
             print(">> When (Semester): " + ", ".join(semester.year.yearly_offered[course.id])) 
             print(">> When (Weekly): " + ", ".join(course_weekly))
             print(">> Where: " + ", ".join(course_locations))
-            print(">> Total Enrollment (All Sections " + str(year.year) + "): " + str(course.yearly_enrolled))
+            print(">> Total Enrollment (" + str(len(course.sections)) + " Sections " + str(year.year) + "): " + str(course.yearly_enrolled))
 
-            if int(year.year) == 2021:
-                print(">> Average Enrollment (All Sections 2019-2021): " + str(course.yearly_enrolled_average))
+            if year_index == 3:
+                i0 = years[year_index - 3].courses.index(course) if course in years[year_index - 3].courses else 0
+                i1 = years[year_index - 2].courses.index(course) if course in years[year_index - 2].courses else 0
+                i2 = years[year_index - 1].courses.index(course) if course in years[year_index - 1].courses else 0
+                course.yearly_enrolled_avg = years[year_index - 3].courses[i0].yearly_enrolled
+                course.yearly_enrolled_avg = course.yearly_enrolled_avg + years[year_index - 2].courses[i1].yearly_enrolled
+                course.yearly_enrolled_avg = course.yearly_enrolled_avg + years[year_index - 1].courses[i2].yearly_enrolled
+                course.yearly_enrolled_avg = round(course.yearly_enrolled_avg / 3)
+
+                print(">> Average Enrollment (All Sections 2019-2021): " + str(course.yearly_enrolled_avg))
             
             print("")
-
+     
 output.close()
