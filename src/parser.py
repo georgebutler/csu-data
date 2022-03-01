@@ -1,6 +1,6 @@
 import os
 import xlrd
-from collections import Counter
+import statistics
 from classes.instructor import Instructor
 from classes.course import Course
 from classes.section import Section
@@ -109,13 +109,35 @@ for year_index, year in enumerate(years):
                 if section.facility_id not in course_locations:
                     course_locations.append(section.facility_id)
 
+            if year_index == 3:
+                i0 = years[year_index - 3].courses.index(course) if course in years[year_index - 3].courses else 0
+                i1 = years[year_index - 2].courses.index(course) if course in years[year_index - 2].courses else 0
+                i2 = years[year_index - 1].courses.index(course) if course in years[year_index - 1].courses else 0
+
+                ye0 = years[year_index - 3].courses[i0].yearly_enrolled
+                ye1 = years[year_index - 2].courses[i1].yearly_enrolled
+                ye2 = years[year_index - 1].courses[i2].yearly_enrolled
+
+                course.yearly_enrolled_avg = round((ye0 + ye1 + ye2) / 3)
+                course.yearly_enrolled_highest = max(ye0, ye1, ye2)
+                course.yearly_enrolled_lowest = min(ye0, ye1, ye2)
+                course.yearly_enrolled_median = statistics.median([ye0, ye1, ye2])
+
             #TODO: How often?
             output.write(str(course) + "\n")
             output.write("> How Often: TODO\n")
             output.write("> When (Semester): " + ", ".join(semester.year.yearly_offered[course.id]) + "\n")
             output.write("> When (Weekly): " + ", ".join(course_weekly) + "\n")
             output.write("> Where: " + ", ".join(course_locations) + "\n")
-            output.write("> Enrollment: TODO\n")
+            output.write(">> Enrollment: \n")
+            output.write(">>> Total Enrollment (" + str(len(course.sections)) + " Sections " + str(year.year) + "): " + str(course.yearly_enrolled) + "\n")
+
+            if year_index == 3:
+                output.write(">>> Average Enrollment (All Sections 2019-2021): " + str(course.yearly_enrolled_avg) + "\n")
+                output.write(">>> Median Enrollment (All Sections 2019-2021): " + str(course.yearly_enrolled_median) + "\n")
+                output.write(">>> Highest Enrollment (All Sections 2019-2021): " + str(course.yearly_enrolled_highest) + "\n")
+                output.write(">>> Lowest Enrollment (All Sections 2019-2021): " + str(course.yearly_enrolled_lowest) + "\n")
+
             output.write("\n")
 
             print("> " + str(course))
@@ -124,19 +146,15 @@ for year_index, year in enumerate(years):
             print(">> When (Semester): " + ", ".join(semester.year.yearly_offered[course.id])) 
             print(">> When (Weekly): " + ", ".join(course_weekly))
             print(">> Where: " + ", ".join(course_locations))
-            print(">> Total Enrollment (" + str(len(course.sections)) + " Sections " + str(year.year) + "): " + str(course.yearly_enrolled))
+            print(">>> Enrollment: ")
+            print(">>>> Total Enrollment (" + str(len(course.sections)) + " Sections " + str(year.year) + "): " + str(course.yearly_enrolled))
 
             if year_index == 3:
-                i0 = years[year_index - 3].courses.index(course) if course in years[year_index - 3].courses else 0
-                i1 = years[year_index - 2].courses.index(course) if course in years[year_index - 2].courses else 0
-                i2 = years[year_index - 1].courses.index(course) if course in years[year_index - 1].courses else 0
-                course.yearly_enrolled_avg = years[year_index - 3].courses[i0].yearly_enrolled
-                course.yearly_enrolled_avg = course.yearly_enrolled_avg + years[year_index - 2].courses[i1].yearly_enrolled
-                course.yearly_enrolled_avg = course.yearly_enrolled_avg + years[year_index - 1].courses[i2].yearly_enrolled
-                course.yearly_enrolled_avg = round(course.yearly_enrolled_avg / 3)
-
-                print(">> Average Enrollment (All Sections 2019-2021): " + str(course.yearly_enrolled_avg))
+                print(">>>> Average Enrollment (All Sections 2019-2021): " + str(course.yearly_enrolled_avg))
+                print(">>>> Median Enrollment (All Sections 2019-2021): " + str(course.yearly_enrolled_median))
+                print(">>>> Highest Enrollment (All Sections 2019-2021): " + str(course.yearly_enrolled_highest))
+                print(">>>> Lowest Enrollment (All Sections 2019-2021): " + str(course.yearly_enrolled_lowest))
             
-            print("")
+            print()
      
 output.close()

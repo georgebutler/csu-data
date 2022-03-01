@@ -6,6 +6,9 @@ class Course:
         self.sections = []
         self.yearly_enrolled = 0
         self.yearly_enrolled_avg = -1
+        self.yearly_enrolled_lowest = -1
+        self.yearly_enrolled_highest = -1
+        self.yearly_enrolled_median = -1
 
     def __eq__(self, other):
         return self.id == other.id
